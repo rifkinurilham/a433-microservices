@@ -1,1 +1,14 @@
+name: CI Karsajobs
+
+on:
+  push:
+    branches:
+      - karsajobs
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo test
+        run: echo "CI Karsajobs running"
 
