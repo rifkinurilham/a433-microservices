@@ -1,11 +1,14 @@
 # Nama workflow
 name: CI Backend Karsajobs
-
-# Workflow ini jalan kalau ada push ke branch karsajobs
 on:
   push:
     branches:
       - karsajobs
+
+ permissions:
+  contents: read
+  packages: write
+
 
 jobs:
   # JOB 1: Lint Dockerfile
