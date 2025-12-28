@@ -1,75 +1,55 @@
-# Nama workflow
-name: CI Backend Karsajobs
+name: CI Karsajobs Backend
+
 on:
   push:
     branches:
       - karsajobs
 
- permissions:
-  contents: read
-  packages: write
-
-
 jobs:
-  # JOB 1: Lint Dockerfile
   lint-dockerfile:
     runs-on: ubuntu-latest
-
     steps:
-      # Ambil source code dari repo
-      - name: Checkout repository
+      - name: Checkout source code
         uses: actions/checkout@v4
 
-      # Install hadolint
       - name: Install hadolint
         run: |
-          sudo wget -O /usr/local/bin/hadolint \
-          https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
-          sudo chmod +x /usr/local/bin/hadolint
+          wget -O hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+          chmod +x hadolint
+          sudo mv hadolint /usr/local/bin/hadolint
 
-      # Jalankan hadolint ke Dockerfile
-      - name: Run hadolint
+      - name: Lint Dockerfile
         run: hadolint Dockerfile
 
-  # JOB 2: Test Go App
   test-app:
     runs-on: ubuntu-latest
     needs: lint-dockerfile
-
     steps:
-      - name: Checkout repository
+      - name: Checkout source code
         uses: actions/checkout@v4
 
-      # Setup Go
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: "1.15"
 
-      # Jalankan unit test 
       - name: Run unit test
         run: go test -v -short --count=1 $(go list ./...)
 
-
-  # JOB 3: Build & Push Image
   build-app-karsajobs:
     runs-on: ubuntu-latest
     needs: test-app
-
     steps:
-      - name: Checkout repository
+      - name: Checkout source code
         uses: actions/checkout@v4
 
-      # Login ke GHCR
-      - name: Login to GHCR
+      - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Build & push image
-      - name: Build Docker image
-  run: |
-    docker build -t rifkinurilham/karsajobs:latest .
-
+      - name: Build and push image
+        run: |
+          docker build -t rifkinurilham/karsajobs:latest .
+          docker push rifkinurilham/karsajobs:latest
