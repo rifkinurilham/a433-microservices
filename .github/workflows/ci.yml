@@ -69,7 +69,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       # Build & push image
-      - name: Build and Push Docker Image
-        run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/karsajobs:latest .
-          docker push ghcr.io/${{ github.repository_owner }}/karsajobs:latest
+      - name: Build Docker image
+  run: |
+    docker build -t rifkinurilham/karsajobs:latest .
+
